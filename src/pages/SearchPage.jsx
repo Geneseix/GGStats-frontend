@@ -22,7 +22,7 @@ export default function SearchPage() {
   const handleSubmit = e => {
     e.preventDefault();
     if (!gameName.trim() || !tagLine.trim()) return;
-    navigate(`/summoner/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}?region=${region}`);
+    navigate(`/summoner/${encodeURIComponent(region)}/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`);
   };
 
   return (
