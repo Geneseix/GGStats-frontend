@@ -197,28 +197,30 @@ function LoginForm({ onLogin }) {
   const handleSubmit = async e => {
     e.preventDefault();
     setMsg('');
-    const res = await fetch('http://localhost:8080/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    });
-    if (res.ok) {
-      const data = await res.json();
-      setMsg('¡Inicio de sesión exitoso!');
-      if (onLogin) onLogin(data.token);
-      navigate('/');
-    } else {
+
+    try {
+      const res = await fetch('http://localhost:8080/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+
       const text = await res.text();
       setMsg(text);
+
+      if (res.ok) {
+        navigate('/search');
+      }
+    } catch (err) {
+      console.error("Error de fetch:", err);
+      setMsg("Error de conexión");
     }
   };
 
   return (
     <form onSubmit={handleSubmit} style={{ marginBottom: 8 }}>
       <div style={{ position: 'relative', marginBottom: 16 }}>
-        <span style={{
-          position: 'absolute', left: 14, top: 13, color: '#aaa', fontSize: 18
-        }}>
+        <span style={{ position: 'absolute', left: 14, top: 13, color: '#aaa', fontSize: 18 }}>
           <i className="fa fa-user" />
         </span>
         <input
@@ -239,9 +241,7 @@ function LoginForm({ onLogin }) {
         />
       </div>
       <div style={{ position: 'relative', marginBottom: 8 }}>
-        <span style={{
-          position: 'absolute', left: 14, top: 13, color: '#aaa', fontSize: 18
-        }}>
+        <span style={{ position: 'absolute', left: 14, top: 13, color: '#aaa', fontSize: 18 }}>
           <i className="fa fa-lock" />
         </span>
         <input
