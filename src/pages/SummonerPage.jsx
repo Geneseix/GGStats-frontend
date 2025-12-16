@@ -1,6 +1,6 @@
 // src/pages/SummonerPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Spin, Alert } from 'antd';
 import HeaderCard from '../components/HeaderCard';
@@ -18,16 +18,26 @@ export default function SummonerPage() {
 
   useEffect(() => {
     setLoading(true);
-    const token = localStorage.getItem('token');
+    setError(null);
+
     const url = `http://localhost:8080/summoner/${region}/${encodeURIComponent(gameName)}/${encodeURIComponent(tagLine)}`;
+
     axios
-      .get(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      .get(url)
       .then((res) => setData(res.data))
-      .catch((err) => setError(err))
+      .catch((err) => {
+        if (err.response) {
+          if (err.response.status === 404) {
+            setError('No se encontró la cuenta. Comprueba el nombre y el tag.');
+          } else {
+            setError('Error al cargar los datos del servidor.');
+          }
+        } else if (err.request) {
+          setError('No se pudo conectar con el servidor.');
+        } else {
+          setError('Ocurrió un error inesperado.');
+        }
+      })
       .finally(() => setLoading(false));
   }, [region, gameName, tagLine]);
 
@@ -51,7 +61,7 @@ export default function SummonerPage() {
       <div style={{ maxWidth: 600, margin: '80px auto' }}>
         <Alert
           message="Error"
-          description="Error al cargar los datos."
+          description={error}
           type="error"
           showIcon
         />
